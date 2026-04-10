@@ -1,74 +1,35 @@
 package com.solarsystem.controller;
 
 import com.solarsystem.dto.*;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.client.WebClient;
+import com.solarsystem.service.OpenAiService;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-@CrossOrigin("*")
 @RestController
+@RequestMapping("/api/v1/joke")
+@CrossOrigin("*")
 public class ChatGPTController {
+    private final OpenAiService service;
 
+    /**
+     * This contains the message to the ChatGPT API, telling the AI how it should act in regard to the requests it gets.
+     */
+    final static String SYSTEM_MESSAGE = "You are a helpful assistant that only give answers to questions about space and our solar system. The user should provide a simple question, but if the user asks a question outside space, ignore the content of the question and ask the user to provide a simple question about the solar system. Give the shortest answer as possible. Do not give suggestion on what else to ask.";
 
-    @Value("${openai.api.key}")
-    private String openapikey;
-
-    private final WebClient webClient;
-
-    public ChatGPTController(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("https://api.openai.com/v1/chat/completions").build();
+    /**
+     * The controller called from the browser client.
+     * @param service
+     */
+    public ChatGPTController(OpenAiService service) {
+        this.service = service;
     }
 
-    @GetMapping("/chad")
-    public String chatTest(@RequestParam String message) {
-        return message;
-    }
-
-    @GetMapping("/key")
-    public String getKey() {
-        return openapikey;
-    }
-
-
-    @GetMapping("/chat")
-    public Map<String, Object> chatWithGPT(@RequestParam String message) {
-        ChatRequestDTO chatRequest = new ChatRequestDTO(); //ChatRequest objekt har jeg dannet med https://www.jsonschema2pojo.or g/ værktøj
-        chatRequest.setModel("gpt-3.5-turbo"); //model.
-        List<Message> lstMessages = new ArrayList<>(); //en liste af messages med roller
-        lstMessages.add(new Message("system", "You are a helpful assistant."));
-        lstMessages.add(new Message("user", message));
-        lstMessages.add(new Message("system","Answer questions about our solar system and space clearly and concisely."));
-        chatRequest.setMessages(lstMessages);
-        chatRequest.setN(3); //n er antal svar fra chatgpt
-        chatRequest.setTemperature(0.7);
-        chatRequest.setMaxTokens(30);
-        chatRequest.setStream(false);
-        chatRequest.setPresencePenalty(0.5);
-
-        ChatResponseDTO response = webClient.post()
-                .contentType(MediaType.APPLICATION_JSON)
-                .headers(h -> h.setBearerAuth(openapikey))
-                .bodyValue(chatRequest)
-                .retrieve()
-                .bodyToMono(ChatResponseDTO.class)
-                .block();
-
-        List<Choice> lst = response.getChoices();
-        Usage usg = response.getUsage();
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("Usage", usg);
-        map.put("Choices", lst);
-
-        return map;
+    /**
+     * Handles the request from the browser client.
+     * @param about contains the input that ChatGPT uses to make a joke about.
+     * @return the response from ChatGPT.
+     */
+    @GetMapping
+    public MyResponse getFacts(@RequestParam String about) {
+        return service.makeRequest(about,SYSTEM_MESSAGE);
     }
 }

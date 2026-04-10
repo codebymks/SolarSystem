@@ -1,3 +1,6 @@
+console.log("JS loaded");
+console.log("Form found:", document.getElementById("chatForm"));
+document.addEventListener("DOMContentLoaded", function() {
 //Animation of the solar system.
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -100,24 +103,30 @@ function addMessage(text, who) {
 }
 
 //When the user submits a question
-form.addEventListener("submit", async function(e) {
-    e.preventDefault();
+    form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        console.log("Form submitted!"); // Add this
 
-    const question = input.value.trim();
-    if (!question) return;
+        const question = input.value.trim();
+        if (!question) return;
 
-    addMessage(question, "user");
-    input.value = "";
-    spinner.style.display = "block";
+        addMessage(question, "user");
+        input.value = "";
+        spinner.style.display = "block";
 
-    try {
-        const response = await fetch("/chat?message=" + encodeURIComponent(question));
-        const data = await response.json();
-        const answer = data.Choices[0].message.content;
-        addMessage(answer, "bot");
-    } catch (error) {
-        addMessage("Error: could not reach the server.", "bot");
-    } finally {
-        spinner.style.display = "none";
-    }
+        try {
+            console.log("Fetching..."); // Add this
+            const response = await fetch("http://localhost:8080/api/v1/joke?about=" + encodeURIComponent(question));
+            console.log("Response status:", response.status); // Add this
+            const data = await response.json();
+            console.log("Data received:", data); // Add this
+            const answer = data.answer;
+            addMessage(answer, "bot");
+        } catch (error) {
+            console.error("Fetch failed:", error); // Change this
+            addMessage("Error: " + error.message, "bot");
+        } finally {
+            spinner.style.display = "none";
+        }
+    });
 });
