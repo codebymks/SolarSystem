@@ -27,9 +27,6 @@ public class OpenAiService {
 
     //See here for a decent explanation of the parameters send to the API via the requestBody
     //https://platform.openai.com/docs/api-reference/completions/create
-
-    //Gør svar mere akkurat.
-    // @Value henter værdier fra application.properties
     @Value("${app.url}")
     public String URL;
 
@@ -81,7 +78,6 @@ public class OpenAiService {
             System.out.println(json);
             //WEBCLIENT
             ChatCompletionResponse response = client.post()
-                    // . er et builderpattern design type.
                     .uri(new URI(URL))
                     .header("Authorization", "Bearer " + API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)

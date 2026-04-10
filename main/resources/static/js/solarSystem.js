@@ -1,5 +1,4 @@
 console.log("JS loaded");
-console.log("Form found:", document.getElementById("chatForm"));
 document.addEventListener("DOMContentLoaded", function() {
 //Animation of the solar system.
 const canvas = document.getElementById("canvas");
@@ -56,7 +55,7 @@ function draw() {
         const x = cx + Math.cos(planet.angle) * planet.distance;
         const y = cy + Math.sin(planet.angle) * planet.distance;
 
-        //Draw the orbit circle (faint ring)
+        //Draw the orbit circle (faint rings)
         ctx.beginPath();
         ctx.arc(cx, cy, planet.distance, 0, Math.PI * 2);
         ctx.strokeStyle = "rgba(255,255,255,0.08)";
@@ -105,7 +104,7 @@ function addMessage(text, who) {
 //When the user submits a question
     form.addEventListener("submit", async function (e) {
         e.preventDefault();
-        console.log("Form submitted!"); // Add this
+        console.log("Form submitted!");
 
         const question = input.value.trim();
         if (!question) return;
@@ -115,15 +114,15 @@ function addMessage(text, who) {
         spinner.style.display = "block";
 
         try {
-            console.log("Fetching..."); // Add this
-            const response = await fetch("http://localhost:8080/api/v1/joke?about=" + encodeURIComponent(question));
-            console.log("Response status:", response.status); // Add this
+            console.log("Fetching...");
+            const response = await fetch("http://localhost:8080/api/solarsystem?about=" + encodeURIComponent(question));
+            console.log("Response status:", response.status);
             const data = await response.json();
-            console.log("Data received:", data); // Add this
+            console.log("Data received:", data);
             const answer = data.answer;
             addMessage(answer, "bot");
         } catch (error) {
-            console.error("Fetch failed:", error); // Change this
+            console.error("Fetch failed:", error);
             addMessage("Error: " + error.message, "bot");
         } finally {
             spinner.style.display = "none";
