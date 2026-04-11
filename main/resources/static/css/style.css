@@ -21,10 +21,6 @@ body {
     font-family: Arial, sans-serif;
 }
 
-canvas {
-    display: block;
-}
-
 #speedControl {
     position: absolute;
     bottom: 800px;
