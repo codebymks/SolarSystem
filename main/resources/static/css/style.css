@@ -27,8 +27,8 @@ canvas {
 
 #speedControl {
     position: absolute;
-    bottom: 20px;
-    left: 50%;
+    bottom: 800px;
+    left: 10%;
     transform: translateX(-50%);
     font-size: 14px;
 }
